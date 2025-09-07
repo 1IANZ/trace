@@ -1,19 +1,10 @@
-"use client";
-import dynamic from "next/dynamic";
-import IDL from "../../anchor/idl/trace.json";
-import { Trace } from "../../anchor/types/trace";
-const WalletMultiButton = dynamic(
-  () =>
-    import("@solana/wallet-adapter-react-ui").then(
-      (mod) => mod.WalletMultiButton
-    ),
-  { ssr: false }
-);
+'use client'
+import TitleBar from "@/components/TitleBar";
+import { Button } from "@mui/material";
 
 export default function Home() {
   return (
-    <div>
-      <WalletMultiButton />
-    </div>
-  );
+    <TitleBar />
+
+  )
 }

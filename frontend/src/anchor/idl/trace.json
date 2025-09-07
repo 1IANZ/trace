@@ -9,16 +9,7 @@
   "instructions": [
     {
       "name": "append_record",
-      "discriminator": [
-        74,
-        169,
-        62,
-        27,
-        47,
-        32,
-        95,
-        76
-      ],
+      "discriminator": [74, 169, 62, 27, 47, 32, 95, 76],
       "accounts": [
         {
           "name": "trace_account",
@@ -27,13 +18,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  116,
-                  114,
-                  97,
-                  99,
-                  101
-                ]
+                "value": [116, 114, 97, 99, 101]
               },
               {
                 "kind": "account",
@@ -57,16 +42,7 @@
     },
     {
       "name": "clear",
-      "discriminator": [
-        250,
-        39,
-        28,
-        213,
-        123,
-        163,
-        133,
-        5
-      ],
+      "discriminator": [250, 39, 28, 213, 123, 163, 133, 5],
       "accounts": [
         {
           "name": "trace_account",
@@ -75,13 +51,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  116,
-                  114,
-                  97,
-                  99,
-                  101
-                ]
+                "value": [116, 114, 97, 99, 101]
               },
               {
                 "kind": "account",
@@ -100,16 +70,7 @@
     },
     {
       "name": "delete",
-      "discriminator": [
-        165,
-        204,
-        60,
-        98,
-        134,
-        15,
-        83,
-        134
-      ],
+      "discriminator": [165, 204, 60, 98, 134, 15, 83, 134],
       "accounts": [
         {
           "name": "trace_account",
@@ -118,13 +79,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  116,
-                  114,
-                  97,
-                  99,
-                  101
-                ]
+                "value": [116, 114, 97, 99, 101]
               },
               {
                 "kind": "account",
@@ -148,16 +103,7 @@
     },
     {
       "name": "get_trace",
-      "discriminator": [
-        162,
-        243,
-        83,
-        76,
-        81,
-        40,
-        50,
-        32
-      ],
+      "discriminator": [162, 243, 83, 76, 81, 40, 50, 32],
       "accounts": [
         {
           "name": "trace_account",
@@ -165,13 +111,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  116,
-                  114,
-                  97,
-                  99,
-                  101
-                ]
+                "value": [116, 114, 97, 99, 101]
               },
               {
                 "kind": "account",
@@ -191,16 +131,7 @@
     },
     {
       "name": "init_trace",
-      "discriminator": [
-        133,
-        45,
-        224,
-        207,
-        140,
-        102,
-        110,
-        23
-      ],
+      "discriminator": [133, 45, 224, 207, 140, 102, 110, 23],
       "accounts": [
         {
           "name": "trace_account",
@@ -209,13 +140,7 @@
             "seeds": [
               {
                 "kind": "const",
-                "value": [
-                  116,
-                  114,
-                  97,
-                  99,
-                  101
-                ]
+                "value": [116, 114, 97, 99, 101]
               },
               {
                 "kind": "arg",
@@ -245,16 +170,7 @@
   "accounts": [
     {
       "name": "TraceAccount",
-      "discriminator": [
-        153,
-        32,
-        65,
-        100,
-        169,
-        62,
-        110,
-        137
-      ]
+      "discriminator": [153, 32, 65, 100, 169, 62, 110, 137]
     }
   ],
   "errors": [
