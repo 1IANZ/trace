@@ -8,6 +8,35 @@
   },
   "instructions": [
     {
+      "name": "add_user_to_whitelist",
+      "discriminator": [244, 177, 124, 12, 22, 50, 139, 152],
+      "accounts": [
+        {
+          "name": "whitelist_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [119, 104, 105, 116, 101, 108, 105, 115, 116]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "user_to_add",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "append_record",
       "discriminator": [74, 169, 62, 27, 47, 32, 95, 76],
       "accounts": [
@@ -24,6 +53,17 @@
                 "kind": "account",
                 "path": "trace_account.product_id",
                 "account": "TraceAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "whitelist_account",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [119, 104, 105, 116, 101, 108, 105, 115, 116]
               }
             ]
           }
@@ -62,6 +102,17 @@
           }
         },
         {
+          "name": "whitelist_account",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [119, 104, 105, 116, 101, 108, 105, 115, 116]
+              }
+            ]
+          }
+        },
+        {
           "name": "user",
           "signer": true
         }
@@ -85,6 +136,17 @@
                 "kind": "account",
                 "path": "trace_account.product_id",
                 "account": "TraceAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "whitelist_account",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [119, 104, 105, 116, 101, 108, 105, 115, 116]
               }
             ]
           }
@@ -150,6 +212,17 @@
           }
         },
         {
+          "name": "whitelist_account",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [119, 104, 105, 116, 101, 108, 105, 115, 116]
+              }
+            ]
+          }
+        },
+        {
           "name": "user",
           "writable": true,
           "signer": true
@@ -165,12 +238,73 @@
           "type": "string"
         }
       ]
+    },
+    {
+      "name": "init_whitelist",
+      "discriminator": [103, 193, 162, 241, 234, 97, 110, 71],
+      "accounts": [
+        {
+          "name": "whitelist_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [119, 104, 105, 116, 101, 108, 105, 115, 116]
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "remove_user_from_whitelist",
+      "discriminator": [198, 73, 139, 218, 243, 209, 180, 182],
+      "accounts": [
+        {
+          "name": "whitelist_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [119, 104, 105, 116, 101, 108, 105, 115, 116]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "user_to_remove",
+          "type": "pubkey"
+        }
+      ]
     }
   ],
   "accounts": [
     {
       "name": "TraceAccount",
       "discriminator": [153, 32, 65, 100, 169, 62, 110, 137]
+    },
+    {
+      "name": "WhitelistAccount",
+      "discriminator": [220, 23, 250, 64, 154, 251, 129, 36]
     }
   ],
   "errors": [
@@ -178,6 +312,16 @@
       "code": 6000,
       "name": "InvalidIndex",
       "msg": "Invalid index"
+    },
+    {
+      "code": 6001,
+      "name": "UnauthorizedUser",
+      "msg": "Unauthorized user"
+    },
+    {
+      "code": 6002,
+      "name": "UnauthorizedAdmin",
+      "msg": "Unauthorized admin"
     }
   ],
   "types": [
@@ -237,6 +381,20 @@
           {
             "name": "description",
             "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "whitelisted_users",
+            "type": {
+              "vec": "pubkey"
+            }
           }
         ]
       }
