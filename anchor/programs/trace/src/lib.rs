@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("9VEMBenFkotjdBVsJXEBdsSLfc3Ao3fihsrL1TaqK5wu");
+declare_id!("6J6XAc6zyaNLNav4YMyyAdVC64dcURewis9aqUAaNBdG");
 const ADMIN_PUBKEY_STRING: &str = "BYRNpGvSx1UKJ24z79gBpRYBNTGvBqZBPx2Cbw2GLKAa";
 #[program]
 pub mod trace {

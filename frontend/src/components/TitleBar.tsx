@@ -1,3 +1,4 @@
+'use client';
 import { ModeToggle } from './themeButton';
 import dynamic from 'next/dynamic';
 const WalletMultiButton = dynamic(
