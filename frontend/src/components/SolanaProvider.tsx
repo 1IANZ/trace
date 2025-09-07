@@ -1,5 +1,4 @@
 'use client';
-
 import { FC, ReactNode, useMemo } from 'react';
 import { web3 } from '@coral-xyz/anchor';
 import {

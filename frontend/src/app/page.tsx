@@ -17,7 +17,7 @@ import TraceCard from "@/components/traceCard";
 import { useRouter } from 'next/navigation';
 
 const TraceData: TraceAccount = {
-  productId: '1A2B3C4D5E6F',
+  productId: '10001',
   records: [
     { ts: new Date().getTime() / 1000 - 172800, description: '原料采购完成，并进行质量检验。' },
     { ts: new Date().getTime() / 1000 - 129600, description: '产品在工厂完成加工并打包。' },
