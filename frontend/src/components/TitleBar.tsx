@@ -8,8 +8,8 @@ const WalletMultiButton = dynamic(
 );
 export default function TitleBar() {
   return (
-    <header className="flex justify-between m-2">
-      <h1 className='text-3xl font-bold'>Trace</h1>
+    <header className="flex justify-between mx-auto p-2 z-50 fixed w-full top-0 bg-white">
+      <h1 className='text-3xl font-bold text-black '>Trace</h1>
       <WalletMultiButton />
     </header>
   )

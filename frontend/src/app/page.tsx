@@ -9,12 +9,27 @@ import {
 import { useEffect, useState } from "react";
 import IDL from "../anchor/idl/trace.json"
 import { Trace } from "../anchor/types/trace"
+import { Button } from "@/components/ui/button";
+
+
+// const dummyTraceData = {
+//   productId: '1A2B3C4D5E6F',
+//   records: [
+//     { ts: new Date().getTime() / 1000 - 86400, description: '产品在工厂完成加工并打包。' },
+//     { ts: new Date().getTime() / 1000 - 43200, description: '产品进入冷链物流运输。' },
+//     { ts: new Date().getTime() / 1000, description: '产品到达零售仓库。' },
+//   ],
+// };
+
 export default function Home() {
   const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
   const wallet = useAnchorWallet();
   const [balance, setBalance] = useState(0);
   const [program, setProgram] = useState<Program<Trace>>();
+
+
+
   useEffect(() => {
     fetchBalance();
     Initialize();
@@ -42,21 +57,14 @@ export default function Home() {
     }
   };
 
-  function get_PDA(productId: string): web3.PublicKey {
-    const programId = new web3.PublicKey(IDL.address);
-    const [traceAccount, _] = web3.PublicKey.findProgramAddressSync(
-      [
-        Buffer.from('trace'),
-        Buffer.from(productId)
-      ],
-      programId
-    );
-    return traceAccount;
-  }
-
   return (
-    <TitleBar />
+    <>
+      <TitleBar />
+      <div className="flex justify-center  pt-16">
+
+      </div >
+    </>
+  );
+};
 
 
-  )
-}
