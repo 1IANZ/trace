@@ -86,17 +86,17 @@ export default function Home() {
   return (
     <>
       <TitleBar solBalance={balance} />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="text-center">
-            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight sm:text-5xl">
+            <h1 className="text-4xl font-extraboldtracking-tight sm:text-5xl">
               产品追溯信息查询
             </h1>
-            <p className="mt-3 text-xl text-gray-600 dark:text-gray-400">
+            <p className="mt-3 text-xl">
               输入产品 ID，查看产品从生产到交付的完整生命周期。
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="shadow-lg rounded-lg p-6 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="flex-grow w-full">
               <label htmlFor="productId" className="sr-only">产品 ID</label>
               <Input

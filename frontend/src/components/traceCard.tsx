@@ -22,16 +22,14 @@ export default function TraceCard({ traceData }: TraceCardProps) {
     <>
       {traceData && (
         <div className="mt-8 space-y-6">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-50">
+          <h2 className="text-3xl font-bold">
             产品 ID:{" "}
             <span className="text-indigo-600 dark:text-indigo-400">
               {traceData.productId}
             </span>
           </h2>
 
-          <Separator className="bg-gray-300 dark:bg-gray-700" />
-
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-50 mb-4">
+          <h3 className="text-2xl font-bold mb-4">
             追溯记录:
           </h3>
 
@@ -56,11 +54,11 @@ export default function TraceCard({ traceData }: TraceCardProps) {
 
                   return (
                     <div key={globalIndex} className="relative flex-1 min-w-0">
-                      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-xl w-full">
+                      <div className="shadow-md rounded-lg p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-xl w-full">
                         <h4 className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
                           步骤 {globalIndex + 1}
                         </h4>
-                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                        <p className="mt-2 ">
                           {record.description}
                         </p>
                         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -82,7 +80,7 @@ export default function TraceCard({ traceData }: TraceCardProps) {
                             viewBox="0 0 24 24"
                             strokeWidth={2}
                             stroke="currentColor"
-                            className="w-full h-full text-gray-400 dark:text-gray-500"
+                            className="w-full h-full"
                           >
                             <path
                               strokeLinecap="round"
@@ -102,7 +100,7 @@ export default function TraceCard({ traceData }: TraceCardProps) {
                             viewBox="0 0 24 24"
                             strokeWidth={2}
                             stroke="currentColor"
-                            className="w-full h-full text-gray-400 dark:text-gray-500"
+                            className="w-full h-full"
                           >
                             <path
                               strokeLinecap="round"

@@ -70,6 +70,29 @@ pub mod trace {
         trace_account.records.push(record);
         Ok(())
     }
+    pub fn update_record(
+        ctx: Context<UpdateRecord>,
+        index: u64,
+        new_description: String,
+    ) -> Result<()> {
+        require!(
+            ctx.accounts
+                .whitelist_account
+                .whitelisted_users
+                .contains(&ctx.accounts.user.key()),
+            ErrorCode::UnauthorizedUser
+        );
+
+        let trace_account = &mut ctx.accounts.trace_account;
+        let idx = index as usize;
+        if idx >= trace_account.records.len() {
+            return Err(ErrorCode::InvalidIndex.into());
+        }
+
+        trace_account.records[idx].description = new_description;
+
+        Ok(())
+    }
     pub fn delete(ctx: Context<DeleteRecord>, index: u64) -> Result<()> {
         require!(
             ctx.accounts
@@ -236,4 +259,16 @@ pub struct WhitelistAccount {
 }
 impl WhitelistAccount {
     pub const MAX_SIZE: usize = 4 + (32 * 10);
+}
+#[derive(Accounts)]
+pub struct UpdateRecord<'info> {
+    #[account(
+        mut,
+        seeds = [b"trace", trace_account.product_id.as_bytes()],
+        bump
+    )]
+    pub trace_account: Account<'info, TraceAccount>,
+    #[account(seeds = [b"whitelist"], bump)]
+    pub whitelist_account: Account<'info, WhitelistAccount>,
+    pub user: Signer<'info>,
 }
