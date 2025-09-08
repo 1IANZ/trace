@@ -1,5 +1,5 @@
 export type Trace = {
-  "address": "9VEMBenFkotjdBVsJXEBdsSLfc3Ao3fihsrL1TaqK5wu",
+  "address": "6J6XAc6zyaNLNav4YMyyAdVC64dcURewis9aqUAaNBdG",
   "metadata": {
     "name": "trace",
     "version": "0.1.0",
@@ -465,6 +465,79 @@ export type Trace = {
         {
           "name": "userToRemove",
           "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "updateRecord",
+      "discriminator": [
+        54,
+        194,
+        108,
+        162,
+        199,
+        12,
+        5,
+        60
+      ],
+      "accounts": [
+        {
+          "name": "traceAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "trace_account.product_id",
+                "account": "traceAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "whitelistAccount",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  119,
+                  104,
+                  105,
+                  116,
+                  101,
+                  108,
+                  105,
+                  115,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "index",
+          "type": "u64"
+        },
+        {
+          "name": "newDescription",
+          "type": "string"
         }
       ]
     }

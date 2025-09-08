@@ -295,6 +295,54 @@
           "type": "pubkey"
         }
       ]
+    },
+    {
+      "name": "update_record",
+      "discriminator": [54, 194, 108, 162, 199, 12, 5, 60],
+      "accounts": [
+        {
+          "name": "trace_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [116, 114, 97, 99, 101]
+              },
+              {
+                "kind": "account",
+                "path": "trace_account.product_id",
+                "account": "TraceAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "whitelist_account",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [119, 104, 105, 116, 101, 108, 105, 115, 116]
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "index",
+          "type": "u64"
+        },
+        {
+          "name": "new_description",
+          "type": "string"
+        }
+      ]
     }
   ],
   "accounts": [
