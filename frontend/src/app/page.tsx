@@ -1,140 +1,181 @@
 'use client';
 import TitleBar from "@/components/titleBar";
-import { AnchorProvider, Program } from "@coral-xyz/anchor";
-import {
-  useAnchorWallet,
-  useConnection,
-  useWallet,
-} from '@solana/wallet-adapter-react';
+import { AnchorProvider, Program, Wallet } from "@coral-xyz/anchor";
+import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useEffect, useState } from "react";
-import IDL from "../anchor/idl/trace.json"
-import { Trace } from "../anchor/types/trace"
+import { useRouter } from 'next/navigation';
+import IDL from "../anchor/idl/trace.json";
+import { Trace } from "../anchor/types/trace";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TraceAccount } from "@/utils/types";
-import { fetchWhitelist } from "@/utils/pdas";
+import { fetchtrace, fetchWhitelist } from "@/utils/pdas";
 import TraceCard from "@/components/traceCard";
-import { useRouter } from 'next/navigation';
-
-const TraceData: TraceAccount = {
-  productId: '10001',
-  records: [
-    { ts: new Date().getTime() / 1000 - 172800, description: '原料采购完成，并进行质量检验。' },
-    { ts: new Date().getTime() / 1000 - 129600, description: '产品在工厂完成加工并打包。' },
-    { ts: new Date().getTime() / 1000 - 86400, description: '产品进入冷链物流运输，发货地：XX仓。' },
-    { ts: new Date().getTime() / 1000 - 43200, description: '产品抵达YY市分拨中心。' },
-    { ts: new Date().getTime() / 1000, description: '产品到达零售仓库，已签收。' },
-    { ts: new Date().getTime() / 1000 + 43200, description: '产品通过线上渠道售出。' },
-    { ts: new Date().getTime() / 1000 + 86400, description: '用户收到产品并进行首次使用。' },
-    { ts: new Date().getTime() / 1000 + 129600, description: '产品售后服务记录。' },
-  ],
-};
-
+import { Loader2, Search, Frown, Info } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Home() {
   const router = useRouter();
   const { connection } = useConnection();
   const { publicKey } = useWallet();
   const wallet = useAnchorWallet();
-  const [balance, setBalance] = useState<number>(0);
   const [program, setProgram] = useState<Program<Trace>>();
   const [productId, setProductId] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const [error, setError] = useState('');
+  const [traceData, setTraceData] = useState<TraceAccount | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [balance, setBalance] = useState<number>(0);
   const [isWhitelisted, setIsWhitelisted] = useState(false);
+
   useEffect(() => {
-    async function Initialize() {
-      if (!wallet) {
-        return null;
-      }
-      const provider = new AnchorProvider(connection, wallet, {
-        commitment: 'confirmed',
-      });
-      const program: Program<Trace> = new Program(IDL as any, provider);
-      setProgram(program);
-    }
+    const dummyWallet = {
+      publicKey: null,
+      signTransaction: () => Promise.reject("Dummy wallet cannot sign"),
+      signAllTransactions: () => Promise.reject("Dummy wallet cannot sign"),
+    } as unknown as Wallet;
+
+    const provider = new AnchorProvider(connection, dummyWallet, { commitment: 'confirmed' });
+    const programInstance: Program<Trace> = new Program(IDL as any, provider);
+    setProgram(programInstance);
+  }, [connection]);
+
+  useEffect(() => {
 
     const fetchBalance = async () => {
       if (publicKey) {
         try {
-          const lamports = await connection.getBalance(publicKey!);
-          const sol = lamports / 1_000_000_000;
-          setBalance(sol);
+          const lamports = await connection.getBalance(publicKey);
+          setBalance(lamports / 1_000_000_000);
         } catch (err) {
-          console.error('Failed to fetch balance:', err);
+          console.error('获取余额失败:', err);
         }
       }
     };
-    fetchBalance();
-    Initialize();
-  }, [publicKey, connection]);
 
-  useEffect(() => {
-    async function checkWhitelist() {
+
+    const checkWhitelist = async () => {
       if (program && publicKey) {
-        const whitelistUsers = await fetchWhitelist(program);
+        if (!wallet) return;
+        const signedProvider = new AnchorProvider(connection, wallet, { commitment: 'confirmed' });
+        const signedProgram = new Program<Trace>(IDL as any, signedProvider);
+
+        const whitelistUsers = await fetchWhitelist(signedProgram);
         setIsWhitelisted(whitelistUsers.some(pk => pk.toString() === publicKey.toString()));
       }
-    }
+    };
+
+    fetchBalance();
     checkWhitelist();
-  }, [program, publicKey]);
+  }, [publicKey, wallet, program, connection]);
+
+  const handleQueryTrace = async () => {
+    if (!program || !productId) {
+      setError("请输入产品ID后再查询。");
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setTraceData(null);
+    setHasSearched(true);
+
+    try {
+      const result = await fetchtrace(program, productId);
+      setTraceData(result);
+    } catch (err) {
+      console.error('查询失败:', err);
+      setError('查询过程中发生未知错误，请稍后重试。');
+      setTraceData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
+  const renderResults = () => {
+    if (loading) {
+      return (
+        <div className="flex flex-col items-center justify-center text-center mt-8 p-12 border rounded-lg">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
+          <p className="mt-4 text-lg text-muted-foreground">正在从区块链查询数据...</p>
+        </div>
+      );
+    }
 
+    if (error) {
+      return (
+        <Alert variant="destructive" className="mt-8">
+          <Info className="h-4 w-4" />
+          <AlertTitle>查询出错</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      );
+    }
 
+    if (hasSearched) {
+      if (traceData && traceData.records.length > 0) {
+        return <TraceCard traceData={traceData} />;
+      } else {
+        return (
+          <div className="flex flex-col items-center justify-center text-center mt-8 p-12 border-2 border-dashed rounded-lg">
+            <Frown className="w-16 h-16 text-yellow-500" />
+            <p className="mt-4 text-xl font-semibold">未找到溯源信息</p>
+            <p className="mt-2 text-muted-foreground">
+              未能找到产品ID为 "<strong>{productId}</strong >" 的溯源信息。
+            </p>
+          </div>
+        );
+      }
+    }
+
+    return null;
+  };
 
   return (
     <>
       <TitleBar solBalance={balance} />
       <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+        <div className="max-w-4xl mx-auto space-y-8">
           <div className="text-center">
-            <h1 className="text-4xl font-extraboldtracking-tight sm:text-5xl">
-              产品追溯信息查询
-            </h1>
-            <p className="mt-3 text-xl">
-              输入产品 ID，查看产品从生产到交付的完整生命周期。
-            </p>
+            {/* ... 标题部分保持不变 ... */}
           </div>
           <div className="shadow-lg rounded-lg p-6 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="flex-grow w-full">
               <label htmlFor="productId" className="sr-only">产品 ID</label>
               <Input
-                id="productId"
-                type="text"
-                value={productId}
+                id="productId" type="text" value={productId}
                 onChange={(e) => setProductId(e.target.value)}
-                placeholder="请输入产品 ID"
-                className="w-full text-lg h-12" />
+                placeholder="请输入产品 ID" className="w-full text-lg h-12"
+                onKeyDown={(e) => e.key === 'Enter' && handleQueryTrace()}
+              />
             </div>
-            <div className="flex flex-row items-center space-x-4">
+            <div className="flex flex-row items-center space-x-4 w-full sm:w-auto">
               <Button
-                className="w-full sm:w-auto h-12 px-6 text-lg cursor-pointer"
+                className="flex-grow sm:flex-grow-0 h-12 px-6 text-lg"
                 disabled={loading}
-                onClick={() => {
-                  console.log(isWhitelisted)
-                }}
+                onClick={handleQueryTrace}
               >
+                {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Search className="mr-2 h-5 w-5" />}
                 查询
               </Button>
-              {isWhitelisted
-                ? (
-                  <Button
-                    className="w-full sm:w-auto h-12 px-6 text-lg cursor-pointer"
-                    disabled={loading}
-                    onClick={() => {
-                      router.push(`/admin`);
-                    }}
-                  >
-                    操作
-                  </Button>
-                ) : null
-              }
+              {isWhitelisted && (
+                <Button
+                  className="flex-grow sm:flex-grow-0 h-12 px-6 text-lg"
+                  variant="outline"
+                  onClick={() => router.push(`/admin`)}
+                >
+                  操作
+                </Button>
+              )}
             </div>
           </div>
-          <TraceCard traceData={TraceData} />
+
+          <div className="mt-8">
+            {renderResults()}
+          </div>
         </div>
-      </div >
+      </div>
     </>
   );
 }
