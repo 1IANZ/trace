@@ -44,10 +44,9 @@ async function fetchtrace(program: Program<Trace>, productId: string) {
     return await program.account.traceAccount.fetch(productPda);
   } catch (err) {
     console.error("获取溯源信息时发生意外错误:", err);
-    throw err; // 对于读取操作，可以继续抛出，让调用者知道发生了严重错误
+    throw err;
   }
 }
-
 
 // 添加用户到白名单
 async function addUserToWhitelist(program: Program<Trace>, userToAdd: web3.PublicKey) {

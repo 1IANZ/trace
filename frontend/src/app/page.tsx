@@ -136,8 +136,14 @@ export default function Home() {
     <>
       <TitleBar solBalance={balance} />
       <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-8">
           <div className="text-center">
+            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
+              产品全流程溯源
+            </h1>
+            <p className="mt-3 text-xl text-muted-foreground">
+              输入产品 ID，查看产品从生产到交付的完整生命周期。
+            </p>
           </div>
           <div className="shadow-lg rounded-lg p-6 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="flex-grow w-full">

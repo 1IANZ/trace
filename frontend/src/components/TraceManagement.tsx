@@ -21,7 +21,7 @@ import { Plus, RefreshCw, Trash2, Edit2 } from 'lucide-react';
 interface TraceManagementProps {
   newProductId: string;
   setNewProductId: (value: string) => void;
-  isLoading: boolean;
+  loading: boolean;
   handleInitTrace: () => void;
   productIdInput: string;
   setProductIdInput: (value: string) => void;
@@ -34,7 +34,6 @@ interface TraceManagementProps {
   handleDeleteClick: (index: number) => void;
   handleClearAll: () => void;
 
-  // 新增：编辑对话框所需的 props
   showEditDialog: boolean;
   setShowEditDialog: (open: boolean) => void;
   editingRecord: { index: number; record: TraceRecord } | null;
@@ -43,7 +42,6 @@ interface TraceManagementProps {
   setEditDescription: (description: string) => void;
   handleConfirmEdit: () => void;
 
-  // 新增：删除确认对话框所需的 props
   showDeleteDialog: boolean;
   setShowDeleteDialog: (open: boolean) => void;
   setRecordToDelete: (index: number | null) => void;
@@ -54,7 +52,7 @@ export default function TraceManagement({
   // 从 props 中解构所有需要用到的变量和函数
   newProductId,
   setNewProductId,
-  isLoading,
+  loading,
   handleInitTrace,
   productIdInput,
   setProductIdInput,
@@ -91,9 +89,9 @@ export default function TraceManagement({
               placeholder="输入产品ID"
               value={newProductId}
               onChange={(e) => setNewProductId(e.target.value)}
-              disabled={isLoading}
+              disabled={loading}
             />
-            <Button onClick={handleInitTrace} disabled={isLoading}>
+            <Button onClick={handleInitTrace} disabled={loading}>
               <Plus className="mr-2 h-4 w-4" />
               初始化
             </Button>
@@ -124,12 +122,12 @@ export default function TraceManagement({
             className="min-h-[100px]"
             value={newRecordDescription}
             onChange={(e) => setNewRecordDescription(e.target.value)}
-            disabled={isLoading || !currentTraceAccount}
+            disabled={loading || !currentTraceAccount}
           />
           <Button
             className="w-full"
             onClick={handleAddRecord}
-            disabled={isLoading || !currentTraceAccount}
+            disabled={loading || !currentTraceAccount}
           >
             <Plus className="mr-2 h-4 w-4" />
             添加记录
@@ -171,7 +169,7 @@ export default function TraceManagement({
               <Button
                 variant="destructive"
                 className="w-full"
-                disabled={isLoading || !currentTraceAccount}
+                disabled={loading || !currentTraceAccount}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 清空所有记录

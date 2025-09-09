@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserPlus, UserMinus } from 'lucide-react';
+import { UserPlus, UserMinus, Loader2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -27,15 +27,14 @@ import TraceManagement from '@/components/TraceManagement';
 const ADMIN_PUBKEY_STRING = "BYRNpGvSx1UKJ24z79gBpRYBNTGvBqZBPx2Cbw2GLKAa";
 
 export default function AdminPage() {
-  // --- States and Hooks ---
   const router = useRouter();
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const { publicKey } = useWallet();
   const [program, setProgram] = useState<Program<Trace> | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [operationLoading, setOperationLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [whitelistUsers, setWhitelistUsers] = useState<string[]>([]);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [userToRemove, setUserToRemove] = useState<string>('');
@@ -50,11 +49,10 @@ export default function AdminPage() {
   const [editingRecord, setEditingRecord] = useState<{ index: number; record: TraceRecord } | null>(null);
   const [editDescription, setEditDescription] = useState('');
 
-  // --- Initialization ---
   useEffect(() => {
     async function init() {
       if (!wallet || !publicKey) return;
-      setLoading(true);
+      setPageLoading(true);
       const provider = new AnchorProvider(connection, wallet, { commitment: 'confirmed' });
       const programInstance = new Program<Trace>(IDL as any, provider);
       setProgram(programInstance);
@@ -64,115 +62,113 @@ export default function AdminPage() {
         if (!whitelist.some(pk => pk.toString() === publicKey.toString())) router.push('/');
         else setWhitelistUsers(whitelist.map(pk => pk.toString()));
       } catch { router.push('/'); }
-      setLoading(false);
+      setPageLoading(false);
     }
     init();
   }, [publicKey, connection, wallet, router]);
 
-  // --- Helper Functions ---
   const fetchAndUpdateWhitelist = async () => {
     if (!program) return;
     const updatedWhitelist = await fetchWhitelist(program);
     setWhitelistUsers(updatedWhitelist.map(pk => pk.toString()));
   };
 
-  // --- Business Logic Handlers ---
   const handleAddUser = async () => {
     if (!program || !newUserAddress) return toast.warning("请输入有效的钱包地址。");
-    setIsLoading(true);
+    setOperationLoading(true);
     const result = await addUserToWhitelist(program, new web3.PublicKey(newUserAddress));
     if (result.success) {
       toast.success("用户添加成功！");
       setNewUserAddress('');
       await fetchAndUpdateWhitelist();
     } else { toast.error(result.error); }
-    setIsLoading(false);
+    setOperationLoading(false);
   };
 
   const handleConfirmRemove = async () => {
     if (!program || !userToRemove) return;
-    setIsLoading(true);
+    setOperationLoading(true);
     const result = await removeUserFromWhitelist(program, new web3.PublicKey(userToRemove));
     if (result.success) {
       toast.success("用户移除成功！");
       await fetchAndUpdateWhitelist();
       setShowRemoveDialog(false);
     } else { toast.error(result.error); }
-    setIsLoading(false);
+    setOperationLoading(false);
   };
 
   const handleInitTrace = async () => {
     if (!program || !newProductId) return toast.warning("请输入产品ID。");
-    setIsLoading(true);
+    setOperationLoading(true);
     const result = await initTrace(program, newProductId);
     if (result.success) {
       toast.success(`产品 "${newProductId}" 初始化成功！`);
       setNewProductId('');
     } else { toast.error(result.error); }
-    setIsLoading(false);
+    setOperationLoading(false);
   };
 
   const handleQueryTrace = async () => {
     if (!program || !productIdInput) return toast.warning("请输入要查询的产品ID。");
-    setIsLoading(true);
+    setOperationLoading(true);
     const traceAccount = await fetchtrace(program, productIdInput);
     setCurrentTraceAccount(traceAccount);
     if (!traceAccount) toast.info(`未找到产品ID为 "${productIdInput}" 的记录。`);
-    setIsLoading(false);
+    setOperationLoading(false);
   };
 
   const handleAddRecord = async () => {
     if (!program || !currentTraceAccount || !newRecordDescription) return;
-    setIsLoading(true);
+    setOperationLoading(true);
     const result = await appendRecord(program, currentTraceAccount.productId, newRecordDescription);
     if (result.success) {
       toast.success("新记录添加成功！");
       setNewRecordDescription('');
       await handleQueryTrace();
     } else { toast.error(result.error); }
-    setIsLoading(false);
+    setOperationLoading(false);
   };
 
   const handleConfirmEdit = async () => {
     if (!program || !editingRecord || !currentTraceAccount) return;
-    setIsLoading(true);
+    setOperationLoading(true);
     const result = await updateRecord(program, currentTraceAccount.productId, editingRecord.index, editDescription);
     if (result.success) {
       toast.success("记录更新成功！");
       setShowEditDialog(false);
       await handleQueryTrace();
     } else { toast.error(result.error); }
-    setIsLoading(false);
+    setOperationLoading(false);
   };
 
   const handleConfirmDelete = async () => {
     if (!program || recordToDelete === null || !currentTraceAccount) return;
-    setIsLoading(true);
+    setOperationLoading(true);
     const result = await deleteRecord(program, currentTraceAccount.productId, recordToDelete);
     if (result.success) {
       toast.success("记录删除成功！");
       setShowDeleteDialog(false);
       await handleQueryTrace();
     } else { toast.error(result.error); }
-    setIsLoading(false);
+    setOperationLoading(false);
   };
 
   const handleClearAll = async () => {
     if (!program || !currentTraceAccount) return;
-    setIsLoading(true);
+    setOperationLoading(true);
     const result = await clearRecords(program, currentTraceAccount.productId);
     if (result.success) {
       toast.success("所有记录已清空！");
       await handleQueryTrace();
     } else { toast.error(result.error); }
-    setIsLoading(false);
+    setOperationLoading(false);
   };
   const handleDeleteClick = (index: number) => { setRecordToDelete(index); setShowDeleteDialog(true); };
   const handleEditClick = (index: number, record: TraceRecord) => { setEditingRecord({ index, record }); setEditDescription(record.description); setShowEditDialog(true); };
   const handleRemoveClick = (user: string) => { setUserToRemove(user); setShowRemoveDialog(true); };
 
   const traceManagementProps = {
-    newProductId, setNewProductId, isLoading, handleInitTrace,
+    newProductId, setNewProductId, loading: operationLoading, handleInitTrace,
     productIdInput, setProductIdInput, handleQueryTrace,
     newRecordDescription, setNewRecordDescription, currentTraceAccount,
     handleAddRecord, handleEditClick, handleDeleteClick, handleClearAll,
@@ -181,7 +177,13 @@ export default function AdminPage() {
     showDeleteDialog, setShowDeleteDialog, setRecordToDelete, handleConfirmDelete,
   };
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="w-12 h-12 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div></div>;
+  if (pageLoading) {
+    return (
+      <div className="container mx-auto p-6 flex justify-center items-center min-h-screen">
+        <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6">
@@ -200,8 +202,11 @@ export default function AdminPage() {
               <CardHeader><CardTitle>白名单管理</CardTitle><CardDescription>管理有权限访问溯源系统的用户</CardDescription></CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex gap-2">
-                  <Input placeholder="输入用户钱包地址" value={newUserAddress} onChange={(e) => setNewUserAddress(e.target.value)} disabled={isLoading} />
-                  <Button onClick={handleAddUser} disabled={isLoading}><UserPlus className="mr-2 h-4 w-4" /> 添加用户</Button>
+                  <Input placeholder="输入用户钱包地址" value={newUserAddress} onChange={(e) => setNewUserAddress(e.target.value)} disabled={operationLoading} />
+                  <Button onClick={handleAddUser} disabled={operationLoading}>
+                    {operationLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
+                    添加用户
+                  </Button>
                 </div>
                 <div className="border rounded-lg">
                   <Table>
@@ -210,7 +215,11 @@ export default function AdminPage() {
                       {whitelistUsers.map((user) => (
                         <TableRow key={user}>
                           <TableCell className="font-mono text-sm">{user}</TableCell>
-                          <TableCell className="text-right"><Button variant="destructive" size="sm" onClick={() => handleRemoveClick(user)}><UserMinus className="h-4 w-4" /></Button></TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="destructive" size="sm" onClick={() => handleRemoveClick(user)} disabled={operationLoading}>
+                              <UserMinus className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -231,7 +240,10 @@ export default function AdminPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmRemove}>确认</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirmRemove} disabled={operationLoading}>
+              {operationLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              确认
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
