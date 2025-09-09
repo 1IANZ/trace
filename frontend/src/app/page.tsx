@@ -136,9 +136,8 @@ export default function Home() {
     <>
       <TitleBar solBalance={balance} />
       <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-6xl mx-auto space-y-8">
           <div className="text-center">
-            {/* ... 标题部分保持不变 ... */}
           </div>
           <div className="shadow-lg rounded-lg p-6 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="flex-grow w-full">

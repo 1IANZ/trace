@@ -185,7 +185,10 @@ export default function AdminPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">{isAdmin ? '管理员操作页面' : '溯源管理页面'}</h1>
+      <div className="flex flex-row justify-between ">
+        <h1 className="text-3xl font-bold mb-6">{isAdmin ? '管理员操作页面' : '溯源管理页面'}</h1>
+        <Button onClick={() => router.back()}>返回</Button>
+      </div>
       {isAdmin ? (
         <Tabs defaultValue="whitelist" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
