@@ -64,23 +64,34 @@ export default function TraceCard({ traceData }: TraceCardProps) {
                     <div key={globalIndex} className="relative flex-1 min-w-[200px] mb-6 sm:mb-0">
                       <div className="shadow-md rounded-lg p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-xl w-full h-full">
                         <h4 className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
-                          {/* **逻辑修正：** 为了匹配从旧到新的时间流，步骤号应该是递增的。 */}
-                          步骤 {globalIndex + 1}
+                          流程 {globalIndex + 1}
                         </h4>
                         <p className="mt-2 text-gray-800 dark:text-gray-200">
                           {record.description}
                         </p>
                         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-mono">
-                          {/* **技术BUG修复：** 这里是必须的改动，否则会显示 Invalid Date */}
                           {new Date(record.ts * 1000).toLocaleString()}
                         </p>
                       </div>
 
-                      {/* 您的箭头逻辑完全保留，因为它是正确的 */}
                       {showHorizontalArrow && (
-                        <div className={`hidden sm:block absolute top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 z-10 ${isReversedRow ? "left-[-1.75rem] " : "right-[-1.75rem]"}`}>
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                        <div
+                          className={`hidden sm:block absolute top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 z-10 
+      ${isReversedRow ? "left-[-1.75rem] rotate-180" : "right-[-1.75rem]"}`}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"
+                            />
                           </svg>
                         </div>
                       )}
