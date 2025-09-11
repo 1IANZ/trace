@@ -1,3 +1,9 @@
+/**
+ * Program IDL in camelCase format in order to be used in JS/TS.
+ *
+ * Note that this is only a type helper and is not the actual IDL. The original
+ * IDL can be found at `target/idl/trace.json`.
+ */
 export type Trace = {
   "address": "6gfJUBVCHqY1JRPx9g8mJnSXJFoDwWwbsMWwRg7uNjdQ",
   "metadata": {
@@ -118,18 +124,6 @@ export type Trace = {
         }
       ],
       "args": [
-        {
-          "name": "step",
-          "type": "string"
-        },
-        {
-          "name": "location",
-          "type": "string"
-        },
-        {
-          "name": "actor",
-          "type": "string"
-        },
         {
           "name": "description",
           "type": "string"
@@ -548,18 +542,6 @@ export type Trace = {
           "type": "u64"
         },
         {
-          "name": "newStep",
-          "type": "string"
-        },
-        {
-          "name": "newLocation",
-          "type": "string"
-        },
-        {
-          "name": "newActor",
-          "type": "string"
-        },
-        {
           "name": "newDescription",
           "type": "string"
         }
@@ -667,10 +649,6 @@ export type Trace = {
           },
           {
             "name": "step",
-            "type": "string"
-          },
-          {
-            "name": "location",
             "type": "string"
           },
           {

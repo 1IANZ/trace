@@ -7,7 +7,7 @@ interface TraceCardProps {
 }
 
 export default function TraceCard({ traceData }: TraceCardProps) {
-  const CHUNK_SIZE = 4; // 每行显示的数量
+  const CHUNK_SIZE = 4;
 
   const chunkedRecords = useMemo(() => {
     if (!traceData?.records || traceData.records.length === 0) {
@@ -60,17 +60,10 @@ export default function TraceCard({ traceData }: TraceCardProps) {
                     <div key={globalIndex} className="relative flex-1 min-w-[200px] mb-6 sm:mb-0">
                       <div className="shadow-md rounded-lg p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-xl w-full h-full">
                         <h4 className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
-                          流程 {globalIndex + 1} - {record.step}
+                          流程 {record.step}
                         </h4>
-
-                        <p className="mt-1 text-gray-800 dark:text-gray-200">
-                          <span className="font-semibold">地点：</span>{record.location}
-                        </p>
-                        <p className="mt-1 text-gray-800 dark:text-gray-200">
-                          <span className="font-semibold">执行者：</span>{record.actor}
-                        </p>
                         <p className="mt-2 text-gray-800 dark:text-gray-200">
-                          <span className="font-semibold">描述：</span>{record.description}
+                          {record.description}
                         </p>
                         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-mono">
                           {new Date(record.ts * 1000).toLocaleString()}
@@ -79,7 +72,7 @@ export default function TraceCard({ traceData }: TraceCardProps) {
 
                       {showHorizontalArrow && (
                         <div
-                          className={`hidden sm:block absolute top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 z-10 
+                          className={`hidden sm:block absolute top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 z-10
       ${isReversedRow ? "left-[-1.75rem] rotate-180" : "right-[-1.75rem]"}`}
                         >
                           <svg

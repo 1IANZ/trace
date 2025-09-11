@@ -1,32 +1,32 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Program, AnchorProvider, web3 } from '@coral-xyz/anchor';
-import IDL from '../../anchor/idl/trace.json';
-import { Trace } from '../../anchor/types/trace';
-import {
-  addUserToWhitelist, appendRecord, clearRecords, deleteRecord,
-  fetchtrace, fetchWhitelist, initTrace, removeUserFromWhitelist, updateRecord
-} from '@/utils/pdas';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserPlus, UserMinus, Loader2 } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  addUserToWhitelist, appendRecord, clearRecords, deleteRecord,
+  fetchtrace, fetchWhitelist, initTrace, removeUserFromWhitelist, updateRecord
+} from '@/utils/pdas';
 import { TraceAccount, TraceRecord } from '@/utils/types';
+import { AnchorProvider, Program, web3 } from '@coral-xyz/anchor';
+import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { Loader2, UserMinus, UserPlus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import IDL from '../../anchor/idl/trace.json';
+import { Trace } from '../../anchor/types/trace';
 
-import { toast } from "sonner";
 import TraceManagement from '@/components/TraceManagement';
+import { toast } from "sonner";
 
 const ADMIN_PUBKEY_STRING = "BYRNpGvSx1UKJ24z79gBpRYBNTGvBqZBPx2Cbw2GLKAa";
 
-export default function AdminPage() {
+export default function Page() {
   const router = useRouter();
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
@@ -42,12 +42,10 @@ export default function AdminPage() {
   const [currentTraceAccount, setCurrentTraceAccount] = useState<TraceAccount | null>(null);
   const [productIdInput, setProductIdInput] = useState('');
   const [newProductId, setNewProductId] = useState<string>("");
-  const [newRecordDescription, setNewRecordDescription] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<number | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingRecord, setEditingRecord] = useState<{ index: number; record: TraceRecord } | null>(null);
-  const [editDescription, setEditDescription] = useState('');
 
   useEffect(() => {
     async function init() {
@@ -104,7 +102,10 @@ export default function AdminPage() {
     if (result.success) {
       toast.success(`产品 "${newProductId}" 初始化成功！`);
       setNewProductId('');
-    } else { toast.error(result.error); }
+    } else {
+      const errorMessage = typeof result.error === 'string' ? result.error : "发生未知错误";
+      toast.error(errorMessage);
+    }
     setOperationLoading(false);
   };
 
@@ -117,22 +118,21 @@ export default function AdminPage() {
     setOperationLoading(false);
   };
 
-  const handleAddRecord = async () => {
-    if (!program || !currentTraceAccount || !newRecordDescription) return;
+  const handleAddRecord = async (description: string) => {
+    if (!program || !currentTraceAccount) return;
     setOperationLoading(true);
-    const result = await appendRecord(program, currentTraceAccount.productId, newRecordDescription);
+    const result = await appendRecord(program, currentTraceAccount.productId, description);
     if (result.success) {
       toast.success("新记录添加成功！");
-      setNewRecordDescription('');
       await handleQueryTrace();
     } else { toast.error(result.error); }
     setOperationLoading(false);
   };
 
-  const handleConfirmEdit = async () => {
+  const handleConfirmEdit = async (description: string) => {
     if (!program || !editingRecord || !currentTraceAccount) return;
     setOperationLoading(true);
-    const result = await updateRecord(program, currentTraceAccount.productId, editingRecord.index, editDescription);
+    const result = await updateRecord(program, currentTraceAccount.productId, editingRecord.index, description);
     if (result.success) {
       toast.success("记录更新成功！");
       setShowEditDialog(false);
@@ -163,17 +163,18 @@ export default function AdminPage() {
     } else { toast.error(result.error); }
     setOperationLoading(false);
   };
+
   const handleDeleteClick = (index: number) => { setRecordToDelete(index); setShowDeleteDialog(true); };
-  const handleEditClick = (index: number, record: TraceRecord) => { setEditingRecord({ index, record }); setEditDescription(record.description); setShowEditDialog(true); };
+  const handleEditClick = (index: number, record: TraceRecord) => { setEditingRecord({ index, record }); setShowEditDialog(true); };
   const handleRemoveClick = (user: string) => { setUserToRemove(user); setShowRemoveDialog(true); };
 
   const traceManagementProps = {
     newProductId, setNewProductId, loading: operationLoading, handleInitTrace,
     productIdInput, setProductIdInput, handleQueryTrace,
-    newRecordDescription, setNewRecordDescription, currentTraceAccount,
+    currentTraceAccount,
     handleAddRecord, handleEditClick, handleDeleteClick, handleClearAll,
     showEditDialog, setShowEditDialog, editingRecord, setEditingRecord,
-    editDescription, setEditDescription, handleConfirmEdit,
+    handleConfirmEdit,
     showDeleteDialog, setShowDeleteDialog, setRecordToDelete, handleConfirmDelete,
   };
 
@@ -203,7 +204,7 @@ export default function AdminPage() {
               <CardContent className="space-y-4">
                 <div className="flex gap-2">
                   <Input placeholder="输入用户钱包地址" value={newUserAddress} onChange={(e) => setNewUserAddress(e.target.value)} disabled={operationLoading} />
-                  <Button onClick={handleAddUser} disabled={operationLoading}>
+                  <Button onClick={handleAddUser} disabled={operationLoading || !newUserAddress}>
                     {operationLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
                     添加用户
                   </Button>

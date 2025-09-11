@@ -1,9 +1,7 @@
-
-import { BN, Program, web3 } from "@coral-xyz/anchor";
-import IDL from "../anchor/idl/trace.json";
 import { Trace } from "@/anchor/types/trace";
-import { handleRpc } from "./error";
-
+import { AnchorProvider, BN, Program, web3 } from "@coral-xyz/anchor";
+import IDL from "../anchor/idl/trace.json";
+import { handleRpc, parseRpcError } from "./error";
 
 function getTracePDA(productId: string): web3.PublicKey {
   const programId = new web3.PublicKey(IDL.address);
@@ -90,6 +88,7 @@ async function initTrace(program: Program<Trace>, productId: string) {
   return handleRpc(txPromise);
 }
 
+
 // 添加记录
 async function appendRecord(program: Program<Trace>, productId: string, description: string) {
   const tracePda = getTracePDA(productId);
@@ -104,7 +103,6 @@ async function appendRecord(program: Program<Trace>, productId: string, descript
     .rpc();
   return handleRpc(txPromise);
 }
-
 // 更新记录
 async function updateRecord(program: Program<Trace>, productId: string, index: number, newDescription: string) {
   const tracePda = getTracePDA(productId);
@@ -150,8 +148,38 @@ async function clearRecords(program: Program<Trace>, productId: string) {
   return handleRpc(txPromise);
 }
 
+// 初始化白名单
+async function initWhitelist(program: Program<Trace>) {
+  const whitelistPda = getWhitelistPDA();
+  const txPromise = program.methods
+    .initWhitelist()
+    .accounts({
+      whitelistAccount: whitelistPda,
+      user: program.provider.publicKey!,
+      systemProgram: web3.SystemProgram.programId,
+    })
+    .rpc();
+  return handleRpc(txPromise);
+}
+
+// 获取溯源信息
+async function getTrace(program: Program<Trace>, productId: string) {
+  const tracePda = getTracePDA(productId);
+  try {
+    const result = await program.methods
+      .getTrace()
+      .accounts({
+        traceAccount: tracePda,
+      })
+      .view();
+    return result;
+  } catch (err) {
+    console.error("获取溯源信息时发生错误:", err);
+    return null;
+  }
+}
+
 export {
-  fetchWhitelist, fetchtrace, addUserToWhitelist, removeUserFromWhitelist,
-  initTrace, appendRecord, updateRecord, deleteRecord, clearRecords,
-  getTracePDA, getWhitelistPDA
+  addUserToWhitelist, appendRecord, clearRecords, deleteRecord, fetchtrace, fetchWhitelist, getTrace, getTracePDA,
+  getWhitelistPDA, initTrace, initWhitelist, removeUserFromWhitelist, updateRecord
 };

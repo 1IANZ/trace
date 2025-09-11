@@ -1,18 +1,18 @@
 'use client';
 import TitleBar from "@/components/titleBar";
-import { AnchorProvider, Program, Wallet } from "@coral-xyz/anchor";
-import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { useEffect, useState } from "react";
-import { useRouter } from 'next/navigation';
-import IDL from "../anchor/idl/trace.json";
-import { Trace } from "../anchor/types/trace";
+import TraceCard from "@/components/traceCard";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TraceAccount } from "@/utils/types";
 import { fetchtrace, fetchWhitelist } from "@/utils/pdas";
-import TraceCard from "@/components/traceCard";
-import { Loader2, Search, Frown, Info } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { TraceAccount } from "@/utils/types";
+import { AnchorProvider, Program, Wallet } from "@coral-xyz/anchor";
+import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { Frown, Info, Loader2, Search } from "lucide-react";
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import IDL from "../anchor/idl/trace.json";
+import { Trace } from "../anchor/types/trace";
 
 export default function Home() {
   const router = useRouter();
