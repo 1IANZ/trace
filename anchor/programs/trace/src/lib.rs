@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("6J6XAc6zyaNLNav4YMyyAdVC64dcURewis9aqUAaNBdG");
+declare_id!("6gfJUBVCHqY1JRPx9g8mJnSXJFoDwWwbsMWwRg7uNjdQ");
 const ADMIN_PUBKEY_STRING: &str = "BYRNpGvSx1UKJ24z79gBpRYBNTGvBqZBPx2Cbw2GLKAa";
 #[program]
 pub mod trace {
@@ -53,7 +53,13 @@ pub mod trace {
         trace_account.records = Vec::new();
         Ok(())
     }
-    pub fn append_record(ctx: Context<AppendRecord>, description: String) -> Result<()> {
+    pub fn append_record(
+        ctx: Context<AppendRecord>,
+        step: String,
+        location: String,
+        actor: String,
+        description: String,
+    ) -> Result<()> {
         require!(
             ctx.accounts
                 .whitelist_account
@@ -65,14 +71,21 @@ pub mod trace {
         let trace_account = &mut ctx.accounts.trace_account;
         let record = TraceRecord {
             ts: Clock::get()?.unix_timestamp,
+            step,
+            location,
+            actor,
             description,
         };
         trace_account.records.push(record);
         Ok(())
     }
+
     pub fn update_record(
         ctx: Context<UpdateRecord>,
         index: u64,
+        new_step: String,
+        new_location: String,
+        new_actor: String,
         new_description: String,
     ) -> Result<()> {
         require!(
@@ -89,7 +102,11 @@ pub mod trace {
             return Err(ErrorCode::InvalidIndex.into());
         }
 
-        trace_account.records[idx].description = new_description;
+        let record = &mut trace_account.records[idx];
+        record.step = new_step;
+        record.location = new_location;
+        record.actor = new_actor;
+        record.description = new_description;
 
         Ok(())
     }
@@ -193,15 +210,18 @@ pub struct TraceAccount {
     pub records: Vec<TraceRecord>,
 }
 impl TraceAccount {
-    pub const MAX_SIZE: usize = 32 + (4 + 10 * TraceRecord::SIZE);
+    pub const MAX_SIZE: usize = 32 + (4 + 50 * TraceRecord::SIZE);
 }
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct TraceRecord {
     pub ts: i64,
+    pub step: String,
+    pub location: String,
+    pub actor: String,
     pub description: String,
 }
 impl TraceRecord {
-    pub const SIZE: usize = 8 + (4 + 64);
+    pub const SIZE: usize = 8 + (4 + 64) * 4 + (4 + 128);
 }
 #[error_code]
 pub enum ErrorCode {
@@ -258,7 +278,7 @@ pub struct WhitelistAccount {
     pub whitelisted_users: Vec<Pubkey>,
 }
 impl WhitelistAccount {
-    pub const MAX_SIZE: usize = 4 + (32 * 10);
+    pub const MAX_SIZE: usize = 4 + (32 * 20);
 }
 #[derive(Accounts)]
 pub struct UpdateRecord<'info> {

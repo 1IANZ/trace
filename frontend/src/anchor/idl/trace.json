@@ -1,5 +1,5 @@
 {
-  "address": "6J6XAc6zyaNLNav4YMyyAdVC64dcURewis9aqUAaNBdG",
+  "address": "6gfJUBVCHqY1JRPx9g8mJnSXJFoDwWwbsMWwRg7uNjdQ",
   "metadata": {
     "name": "trace",
     "version": "0.1.0",
@@ -74,6 +74,18 @@
         }
       ],
       "args": [
+        {
+          "name": "step",
+          "type": "string"
+        },
+        {
+          "name": "location",
+          "type": "string"
+        },
+        {
+          "name": "actor",
+          "type": "string"
+        },
         {
           "name": "description",
           "type": "string"
@@ -339,6 +351,18 @@
           "type": "u64"
         },
         {
+          "name": "new_step",
+          "type": "string"
+        },
+        {
+          "name": "new_location",
+          "type": "string"
+        },
+        {
+          "name": "new_actor",
+          "type": "string"
+        },
+        {
           "name": "new_description",
           "type": "string"
         }
@@ -425,6 +449,18 @@
           {
             "name": "ts",
             "type": "i64"
+          },
+          {
+            "name": "step",
+            "type": "string"
+          },
+          {
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "name": "actor",
+            "type": "string"
           },
           {
             "name": "description",

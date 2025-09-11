@@ -49,7 +49,6 @@ interface TraceManagementProps {
 }
 
 export default function TraceManagement({
-  // 从 props 中解构所有需要用到的变量和函数
   newProductId,
   setNewProductId,
   loading,

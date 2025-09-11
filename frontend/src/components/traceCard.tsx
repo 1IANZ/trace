@@ -1,5 +1,3 @@
-// components/TraceCard.tsx
-
 'use client';
 import { TraceAccount } from "@/utils/types";
 import { useMemo } from "react";
@@ -16,8 +14,6 @@ export default function TraceCard({ traceData }: TraceCardProps) {
       return [];
     }
 
-    // **关键改动：删除了我的错误排序！**
-    // 直接使用从链上获取的、默认按时间顺序（从旧到新）的 records 数组。
     const originalRecords = traceData.records;
 
     const chunks: typeof originalRecords[] = [];
@@ -64,10 +60,17 @@ export default function TraceCard({ traceData }: TraceCardProps) {
                     <div key={globalIndex} className="relative flex-1 min-w-[200px] mb-6 sm:mb-0">
                       <div className="shadow-md rounded-lg p-6 border border-gray-200 dark:border-gray-700 transition-all hover:shadow-xl w-full h-full">
                         <h4 className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
-                          流程 {globalIndex + 1}
+                          流程 {globalIndex + 1} - {record.step}
                         </h4>
+
+                        <p className="mt-1 text-gray-800 dark:text-gray-200">
+                          <span className="font-semibold">地点：</span>{record.location}
+                        </p>
+                        <p className="mt-1 text-gray-800 dark:text-gray-200">
+                          <span className="font-semibold">执行者：</span>{record.actor}
+                        </p>
                         <p className="mt-2 text-gray-800 dark:text-gray-200">
-                          {record.description}
+                          <span className="font-semibold">描述：</span>{record.description}
                         </p>
                         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-mono">
                           {new Date(record.ts * 1000).toLocaleString()}

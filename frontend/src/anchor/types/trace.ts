@@ -1,5 +1,5 @@
 export type Trace = {
-  "address": "6J6XAc6zyaNLNav4YMyyAdVC64dcURewis9aqUAaNBdG",
+  "address": "6gfJUBVCHqY1JRPx9g8mJnSXJFoDwWwbsMWwRg7uNjdQ",
   "metadata": {
     "name": "trace",
     "version": "0.1.0",
@@ -118,6 +118,18 @@ export type Trace = {
         }
       ],
       "args": [
+        {
+          "name": "step",
+          "type": "string"
+        },
+        {
+          "name": "location",
+          "type": "string"
+        },
+        {
+          "name": "actor",
+          "type": "string"
+        },
         {
           "name": "description",
           "type": "string"
@@ -536,6 +548,18 @@ export type Trace = {
           "type": "u64"
         },
         {
+          "name": "newStep",
+          "type": "string"
+        },
+        {
+          "name": "newLocation",
+          "type": "string"
+        },
+        {
+          "name": "newActor",
+          "type": "string"
+        },
+        {
           "name": "newDescription",
           "type": "string"
         }
@@ -640,6 +664,18 @@ export type Trace = {
           {
             "name": "ts",
             "type": "i64"
+          },
+          {
+            "name": "step",
+            "type": "string"
+          },
+          {
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "name": "actor",
+            "type": "string"
           },
           {
             "name": "description",
