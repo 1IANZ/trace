@@ -53,13 +53,7 @@ pub mod trace {
         trace_account.records = Vec::new();
         Ok(())
     }
-    pub fn append_record(
-        ctx: Context<AppendRecord>,
-        step: String,
-        location: String,
-        actor: String,
-        description: String,
-    ) -> Result<()> {
+    pub fn append_record(ctx: Context<AppendRecord>, description: String) -> Result<()> {
         require!(
             ctx.accounts
                 .whitelist_account
@@ -69,10 +63,12 @@ pub mod trace {
         );
 
         let trace_account = &mut ctx.accounts.trace_account;
+        let step = (trace_account.records.len() + 1).to_string();
+        let actor = ctx.accounts.user.key().to_string();
+
         let record = TraceRecord {
             ts: Clock::get()?.unix_timestamp,
             step,
-            location,
             actor,
             description,
         };
@@ -83,9 +79,6 @@ pub mod trace {
     pub fn update_record(
         ctx: Context<UpdateRecord>,
         index: u64,
-        new_step: String,
-        new_location: String,
-        new_actor: String,
         new_description: String,
     ) -> Result<()> {
         require!(
@@ -98,15 +91,15 @@ pub mod trace {
 
         let trace_account = &mut ctx.accounts.trace_account;
         let idx = index as usize;
+
         if idx >= trace_account.records.len() {
             return Err(ErrorCode::InvalidIndex.into());
         }
 
         let record = &mut trace_account.records[idx];
-        record.step = new_step;
-        record.location = new_location;
-        record.actor = new_actor;
+        record.actor = ctx.accounts.user.key().to_string();
         record.description = new_description;
+        record.ts = Clock::get()?.unix_timestamp;
 
         Ok(())
     }
@@ -154,18 +147,21 @@ pub struct InitTrace<'info> {
     #[account(
         init,
         payer = user,
-        space = 8 + TraceAccount::MAX_SIZE,
+        space = 8 + TraceAccount::MAX_SIZE, 
         seeds = [b"trace", product_id.as_bytes()],
         bump
     )]
     pub trace_account: Account<'info, TraceAccount>,
+
     #[account(seeds = [b"whitelist"], bump)]
     pub whitelist_account: Account<'info, WhitelistAccount>,
+
     #[account(mut)]
     pub user: Signer<'info>,
 
     pub system_program: Program<'info, System>,
 }
+
 #[derive(Accounts)]
 pub struct AppendRecord<'info> {
     #[account(
@@ -210,18 +206,20 @@ pub struct TraceAccount {
     pub records: Vec<TraceRecord>,
 }
 impl TraceAccount {
-    pub const MAX_SIZE: usize = 32 + (4 + 50 * TraceRecord::SIZE);
+    pub const MAX_SIZE: usize = (4 + 32) + (4 + 20 * TraceRecord::SIZE);
 }
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct TraceRecord {
     pub ts: i64,
     pub step: String,
-    pub location: String,
     pub actor: String,
     pub description: String,
 }
 impl TraceRecord {
-    pub const SIZE: usize = 8 + (4 + 64) * 4 + (4 + 128);
+    pub const SIZE: usize = 8  // ts: i64
+        + (4 + 64)  // step: String
+        + (4 + 64)  // actor: String
+        + (4 + 128); // description: String
 }
 #[error_code]
 pub enum ErrorCode {
@@ -278,7 +276,7 @@ pub struct WhitelistAccount {
     pub whitelisted_users: Vec<Pubkey>,
 }
 impl WhitelistAccount {
-    pub const MAX_SIZE: usize = 4 + (32 * 20);
+    pub const MAX_SIZE: usize = 4 + (32 * 10);
 }
 #[derive(Accounts)]
 pub struct UpdateRecord<'info> {
