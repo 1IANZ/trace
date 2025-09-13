@@ -1,7 +1,7 @@
 import { Trace } from "@/anchor/types/trace";
-import { AnchorProvider, BN, Program, web3 } from "@coral-xyz/anchor";
+import { BN, Program, web3 } from "@coral-xyz/anchor";
 import IDL from "../anchor/idl/trace.json";
-import { handleRpc, parseRpcError } from "./error";
+import { handleRpc } from "./error";
 
 function getTracePDA(productId: string): web3.PublicKey {
   const programId = new web3.PublicKey(IDL.address);
@@ -37,7 +37,7 @@ async function fetchtrace(program: Program<Trace>, productId: string) {
   try {
     const accountInfo = await program.provider.connection.getAccountInfo(productPda);
     if (accountInfo === null) {
-      return null; // 明确表示账户不存在
+      return null;
     }
     return await program.account.traceAccount.fetch(productPda);
   } catch (err) {

@@ -2,11 +2,12 @@
 import { TraceAccount } from "@/utils/types";
 import { useMemo } from "react";
 
-interface TraceCardProps {
+interface traceProps {
   traceData: TraceAccount | null;
 }
 
-export default function TraceCard({ traceData }: TraceCardProps) {
+export default function TraceCard({ traceData }: traceProps) {
+
   const CHUNK_SIZE = 4;
 
   const chunkedRecords = useMemo(() => {
@@ -21,25 +22,16 @@ export default function TraceCard({ traceData }: TraceCardProps) {
       chunks.push(originalRecords.slice(i, i + CHUNK_SIZE));
     }
     return chunks;
-
   }, [traceData]);
-
   if (!traceData) {
     return null;
   }
 
   return (
     <div className="mt-8 space-y-6">
-      <h2 className="text-3xl font-bold text-center sm:text-left">
-        产品 ID:{" "}
-        <span className="text-indigo-600 dark:text-indigo-400 font-mono break-all">
-          {traceData.productId}
-        </span>
-      </h2>
-
       {chunkedRecords.length > 0 ? (
         <>
-          <h3 className="text-2xl font-bold mb-4">追溯记录:</h3>
+
           <div className="flex flex-col gap-y-12">
             {chunkedRecords.map((row, rowIndex) => (
               <div
