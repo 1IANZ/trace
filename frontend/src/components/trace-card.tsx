@@ -4,24 +4,11 @@ import { useMemo } from "react";
 
 interface traceProps {
   traceData: TraceAccount | null;
+  productId: string
 }
 
-export default function TraceCard({ traceData }: traceProps) {
+export default function TraceCard({ traceData, productId }: traceProps) {
   const CHUNK_SIZE = 4;
-
-  const chunkedRecords = useMemo(() => {
-    if (!traceData?.records || traceData.records.length === 0) {
-      return [];
-    }
-
-    const originalRecords = traceData.records;
-    const chunks: typeof originalRecords[] = [];
-    for (let i = 0; i < originalRecords.length; i += CHUNK_SIZE) {
-      chunks.push(originalRecords.slice(i, i + CHUNK_SIZE));
-    }
-    return chunks;
-  }, [traceData]);
-
   const displayData = traceData;
   const displayChunks = useMemo(() => {
     if (!displayData?.records || displayData.records.length === 0) {
@@ -66,6 +53,11 @@ export default function TraceCard({ traceData }: traceProps) {
 
   return (
     <div className="mt-6 sm:mt-8 space-y-8">
+      {productId && (
+        <div className="text-left mb-4 text-lg font-semibold text-foreground">
+          产品ID: <span className="font-mono">{productId}</span>
+        </div>
+      )}
       {displayChunks.length > 0 ? (
         <div className="flex flex-col gap-y-16">
           {displayChunks.map((row, rowIndex) => (

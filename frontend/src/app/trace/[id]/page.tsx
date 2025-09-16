@@ -41,7 +41,7 @@ export default function Page() {
             <p className="mt-4 text-gray-500 text-base sm:text-lg">正在加载溯源数据...</p>
           </div>
         ) : traceData && traceData.records.length > 0 ? (
-          <TraceCard traceData={traceData} />
+          <TraceCard traceData={traceData} productId={id!} />
         ) : (
           <p className="text-gray-500 text-base sm:text-lg mt-4">暂无溯源数据</p>
         )}

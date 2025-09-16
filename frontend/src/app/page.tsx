@@ -127,7 +127,7 @@ export default function Home() {
 
     if (hasSearched) {
       if (traceData && traceData.records.length > 0) {
-        return <TraceCard traceData={traceData} />;
+        return <TraceCard traceData={traceData} productId={productId} />;
       } else {
         return (
           <div className="flex flex-col items-center justify-center text-center mt-8 p-12 sm:p-16 border-2 border-dashed border-yellow-200 dark:border-yellow-800 rounded-2xl w-full bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20">
