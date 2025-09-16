@@ -4,13 +4,15 @@ import TraceCard from "@/components/traceCard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { fetchtrace, fetchWhitelist } from "@/utils/pdas";
 import { TraceAccount } from "@/utils/types";
 import { AnchorProvider, Program, Wallet } from "@coral-xyz/anchor";
 import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Frown, Info, Loader2, Search, SendHorizontal } from "lucide-react";
+import { Frown, Info, Loader2, QrCode, Search, Sparkles } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
+import QRCode from "react-qr-code";
 import IDL from "../anchor/idl/trace.json";
 import { Trace } from "../anchor/types/trace";
 
@@ -28,7 +30,14 @@ export default function Home() {
   const [hasSearched, setHasSearched] = useState(false);
   const [balance, setBalance] = useState<number>(0);
   const [isWhitelisted, setIsWhitelisted] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
 
+  const getTraceUrl = () => {
+    if (typeof window !== 'undefined' && productId) {
+      return `${window.location.origin}/trace/${productId}`;
+    }
+    return '';
+  };
 
   useEffect(() => {
     const initProgram = async () => {
@@ -95,19 +104,23 @@ export default function Home() {
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="flex flex-col items-center justify-center text-center mt-8 p-8 sm:p-12 border rounded-lg w-full">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
-          <p className="mt-4 text-lg text-muted-foreground">正在从区块链查询数据...</p>
+        <div className="flex flex-col items-center justify-center text-center mt-8 p-12 sm:p-16 rounded-2xl w-full bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-200 dark:border-blue-800">
+          <div className="relative">
+            <Loader2 className="w-16 h-16 animate-spin text-blue-600 dark:text-blue-400" />
+            <div className="absolute inset-0 w-16 h-16 bg-blue-600 dark:bg-blue-400 rounded-full blur-xl opacity-20 animate-pulse"></div>
+          </div>
+          <p className="mt-6 text-xl font-medium text-foreground">正在从区块链查询数据...</p>
+          <p className="mt-2 text-sm text-muted-foreground">请稍候，这可能需要几秒钟</p>
         </div>
       );
     }
 
     if (error) {
       return (
-        <Alert variant="destructive" className="mt-8">
-          <Info className="h-4 w-4" />
-          <AlertTitle>查询出错</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
+        <Alert variant="destructive" className="mt-8 border-2 shadow-lg">
+          <Info className="h-5 w-5" />
+          <AlertTitle className="text-lg">查询出错</AlertTitle>
+          <AlertDescription className="mt-2">{error}</AlertDescription>
         </Alert>
       );
     }
@@ -117,12 +130,16 @@ export default function Home() {
         return <TraceCard traceData={traceData} />;
       } else {
         return (
-          <div className="flex flex-col items-center justify-center text-center mt-8 p-8 sm:p-12 border-2 border-dashed rounded-lg w-full">
-            <Frown className="w-16 h-16 text-yellow-500" />
-            <p className="mt-4 text-xl font-semibold">未找到溯源信息</p>
-            <p className="mt-2 text-muted-foreground">
-              未能找到产品ID为 "<strong>{productId}</strong>" 的溯源信息。
+          <div className="flex flex-col items-center justify-center text-center mt-8 p-12 sm:p-16 border-2 border-dashed border-yellow-200 dark:border-yellow-800 rounded-2xl w-full bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20">
+            <div className="relative">
+              <Frown className="w-20 h-20 text-yellow-600 dark:text-yellow-400" />
+              <div className="absolute inset-0 w-20 h-20 bg-yellow-600 dark:bg-yellow-400 rounded-full blur-2xl opacity-20"></div>
+            </div>
+            <p className="mt-6 text-2xl font-semibold text-foreground">未找到溯源信息</p>
+            <p className="mt-3 text-muted-foreground max-w-md">
+              未能找到产品ID为 "<strong className="text-foreground font-mono bg-muted px-2 py-1 rounded">{productId}</strong>" 的溯源信息。
             </p>
+            <p className="mt-2 text-sm text-muted-foreground">请检查产品ID是否正确</p>
           </div>
         );
       }
@@ -134,69 +151,143 @@ export default function Home() {
   return (
     <>
       <TitleBar solBalance={balance} />
-      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-muted/20">
         <div className="max-w-7xl mx-auto space-y-8">
-
-
-          <div className="text-center">
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              产品全流程溯源
-            </h1>
-            <p className="mt-2 sm:mt-3 text-lg sm:text-xl text-muted-foreground">
-              输入产品 ID，查看产品从生产到交付的完整生命周期。
-            </p>
-          </div>
-
-          <div className="shadow-lg rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full">
-            <div className="flex-grow w-full">
-              <label htmlFor="productId" className="sr-only">产品 ID</label>
-              <Input
-                id="productId"
-                type="text"
-                value={productId}
-                onChange={(e) => setProductId(e.target.value)}
-                placeholder="请输入产品 ID"
-                className="w-full text-base sm:text-lg h-10 sm:h-12"
-                onKeyDown={(e) => e.key === 'Enter' && handleQueryTrace()}
-              />
+          <div className="text-center relative">
+            <div className="absolute inset-0 flex items-center justify-center opacity-10">
+              <div className="w-96 h-96 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur-3xl"></div>
             </div>
-            <div className="flex flex-row items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
-              <Button
-                className="flex-grow sm:flex-grow-0 h-10 sm:h-12 px-4 sm:px-6 text-base sm:text-lg"
-                disabled={loading}
-                onClick={handleQueryTrace}
-              >
-                {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Search className="mr-2 h-5 w-5" />}
-                查询
-              </Button>
-              {
-                productId && <Button
-                  className="flex-grow sm:flex-grow-0 h-10 sm:h-12 px-4 sm:px-6 text-base sm:text-lg"
-                  disabled={loading}
-                  onClick={() => router.push("/trace/" + productId)}
-                >
-                  <SendHorizontal className="h-5 w-5" />
-                </Button>
-              }
-              {isWhitelisted && (
-                <Button
-                  className="flex-grow sm:flex-grow-0 h-10 sm:h-12 px-4 sm:px-6 text-base sm:text-lg"
-                  variant="outline"
-                  onClick={() => router.push(`/admin`)}
-                >
-                  操作
-                </Button>
-              )}
+
+            <div className="relative">
+              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                产品全流程溯源
+              </h1>
             </div>
           </div>
 
-          {/* 查询结果 */}
-          <div className="mt-6 sm:mt-8 w-full">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-2xl blur-xl"></div>
+            <div className="relative shadow-2xl rounded-2xl p-6 sm:p-8 bg-background/95 backdrop-blur-sm border border-border/50">
+              <div className="flex items-center gap-3 mb-6">
+                <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <h2 className="text-lg font-semibold">快速查询</h2>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <div className="flex-grow relative">
+                  <label htmlFor="productId" className="sr-only">产品 ID</label>
+                  <div className="relative">
+                    <Input
+                      id="productId"
+                      type="text"
+                      value={productId}
+                      onChange={(e) => setProductId(e.target.value)}
+                      placeholder="请输入产品 ID"
+                      className="w-full text-lg h-14 pl-5 pr-12 rounded-xl border-2 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                      onKeyDown={(e) => e.key === 'Enter' && handleQueryTrace()}
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Button
+                    className="h-14 px-8 text-lg font-medium rounded-xl shadow-lg hover:shadow-xl"
+                    disabled={loading}
+                    onClick={handleQueryTrace}
+                  >
+                    {loading ? (
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    ) : (
+                      <Search className="mr-2 h-5 w-5" />
+                    )}
+                    查询
+                  </Button>
+
+                  {isWhitelisted && (
+                    <Button
+                      className="h-14 px-4 text-lg font-medium rounded-xl shadow-lg hover:shadow-xl"
+                      onClick={() => router.push(`/admin`)}
+                    >
+                      管理
+                    </Button>
+                  )}
+
+                  {productId && (
+                    <Popover open={qrOpen} onOpenChange={setQrOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          className="h-14 w-14 p-0 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                          variant="outline"
+                          disabled={loading}
+                          onMouseEnter={() => setQrOpen(true)}
+                          onMouseLeave={() => setQrOpen(false)}
+                        >
+                          <QrCode className="h-5 w-5" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        side="bottom"
+                        className="w-auto p-0 border-0"
+                        sideOffset={5}
+                        onMouseEnter={() => setQrOpen(true)}
+                        onMouseLeave={() => setQrOpen(false)}
+                      >
+                        <div className="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-2xl border">
+                          <p className="text-sm font-medium text-center mb-3">扫码查看溯源信息</p>
+                          <div className="bg-white p-3 rounded-lg">
+                            <QRCode
+                              value={getTraceUrl()}
+                              size={200}
+                              style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                              viewBox={`0 0 256 256`}
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground text-center mt-3 break-all max-w-[200px]">
+                            {getTraceUrl()}
+                          </p>
+                          <Button
+                            className="w-full mt-3"
+                            size="sm"
+                            onClick={() => {
+                              router.push("/trace/" + productId);
+                              setQrOpen(false);
+                            }}
+                          >
+                            前往查看
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 sm:mt-12 w-full">
             {renderContent()}
           </div>
 
+          {!hasSearched && (
+            <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {[
+                { title: "区块链存证", desc: "数据永久保存，不可篡改", icon: "🔐" },
+                { title: "全程追溯", desc: "从源头到终端，全程可查", icon: "📍" },
+                { title: "实时更新", desc: "供应链信息实时同步", icon: "⚡" }
+              ].map((item, index) => (
+                <div key={index} className="group p-6 rounded-2xl border bg-card hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+                  <div className="text-3xl mb-3">{item.icon}</div>
+                  <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </div >
+      </div>
     </>
   );
 }

@@ -1,55 +1,26 @@
 'use client';
-import { Trace } from "@/anchor/types/trace";
-import IDL from "@/anchor/idl/trace.json";
-import TitleBar from "@/components/titleBar";
-import { TraceAccount } from "@/utils/types";
-import { AnchorProvider, Program } from "@coral-xyz/anchor";
-import { useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useParams } from "next/navigation"
 import { useEffect, useState } from "react";
-import { fetchtrace } from "@/utils/pdas";
+import { useParams } from "next/navigation"
 import { Loader2 } from "lucide-react";
 import TraceCard from "@/components/traceCard";
+import { TraceAccount } from "@/utils/types";
 
 export default function Page() {
   const id = useParams().id?.toString();
-  const { connection } = useConnection();
-  const { publicKey } = useWallet();
-  const wallet = useAnchorWallet();
 
-  const [program, setProgram] = useState<Program<Trace> | null>(null);
   const [loading, setLoading] = useState(false);
   const [traceData, setTraceData] = useState<TraceAccount | null>(null);
-  const [balance, setBalance] = useState<number>(0);
 
-  // 初始化 Program
   useEffect(() => {
-    if (!wallet) return;
-    const provider = new AnchorProvider(connection, wallet, { commitment: 'confirmed' });
-    const programInstance = new Program<Trace>(IDL as any, provider);
-    setProgram(programInstance);
-  }, [connection, wallet]);
-
-  // 查询余额 + traceData
-  useEffect(() => {
-    if (!program || !id) return;
-
-    const fetchBalance = async () => {
-      if (!publicKey) return;
-      try {
-        const lamports = await connection.getBalance(publicKey);
-        setBalance(lamports / 1_000_000_000);
-      } catch (err) {
-        console.error('获取余额失败:', err);
-      }
-    };
+    if (!id) return;
 
     const handleQueryTrace = async () => {
       setLoading(true);
       setTraceData(null);
       try {
-        const result = await fetchtrace(program, id);
-        setTraceData(result);
+        const res = await fetch(`/api/trace?id=${id}`);
+        const data = await res.json();
+        setTraceData(data);
       } catch (err) {
         console.error('查询失败:', err);
         setTraceData(null);
@@ -58,13 +29,11 @@ export default function Page() {
       }
     };
 
-    fetchBalance();
     handleQueryTrace();
-  }, [program, id, publicKey, connection]);
+  }, [id]);
 
   return (
     <>
-      <TitleBar solBalance={balance} />
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-4 w-full">
         {loading ? (
           <div className="flex flex-col items-center justify-center w-full h-full">
