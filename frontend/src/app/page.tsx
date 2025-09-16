@@ -1,6 +1,6 @@
 'use client';
-import TitleBar from "@/components/titleBar";
-import TraceCard from "@/components/traceCard";
+import TitleBar from "@/components/title-bar";
+import TraceCard from "@/components/trace-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

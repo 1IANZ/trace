@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation"
 import { Loader2 } from "lucide-react";
-import TraceCard from "@/components/traceCard";
+import TraceCard from "@/components/trace-card";
 import { TraceAccount } from "@/utils/types";
 
 export default function Page() {

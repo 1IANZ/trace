@@ -1,11 +1,11 @@
-import { SolanaProvider } from "@/components/solanaProvider";
-import { ThemeProvider } from "@/components/themeProvider";
+import { SolanaProvider } from "@/components/solana-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import "./globals.css";
 export const metadata: Metadata = {
   title: "Trace",
-  description:  "Trace By Alex",
+  description: "Trace By Alex",
 };
 
 export default function RootLayout({
