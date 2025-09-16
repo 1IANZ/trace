@@ -21,8 +21,8 @@ import { useEffect, useState } from 'react';
 import IDL from '../../anchor/idl/trace.json';
 import { Trace } from '../../anchor/types/trace';
 
-import TraceManagement from '@/components/trace-management';
 import { toast } from "sonner";
+import TraceManagement from "@/components/trace-management";
 
 const ADMIN_PUBKEY_STRING = "BYRNpGvSx1UKJ24z79gBpRYBNTGvBqZBPx2Cbw2GLKAa";
 
