@@ -8,6 +8,7 @@ interface traceProps {
 }
 
 export default function TraceCard({ traceData, productId }: traceProps) {
+  console.log(traceData)
   const CHUNK_SIZE = 4;
   const displayData = traceData;
   const displayChunks = useMemo(() => {
@@ -119,12 +120,7 @@ export default function TraceCard({ traceData, productId }: traceProps) {
                           <div>
                             <div className="text-xs text-muted-foreground">记录时间</div>
                             <span className="font-mono text-sm font-medium">
-                              {new Date(record.ts * 1000).toLocaleString('zh-CN', {
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
+                              {new Date(record.ts * 1000).toLocaleString()}
                             </span>
                           </div>
                         </div>

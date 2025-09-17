@@ -4,6 +4,18 @@ import { useParams } from "next/navigation"
 import { Loader2 } from "lucide-react";
 import TraceCard from "@/components/trace-card";
 import { TraceAccount } from "@/utils/types";
+import { BN } from "@coral-xyz/anchor";
+
+
+function reviveTrace(raw: any): TraceAccount {
+  return {
+    productId: raw.productId,
+    records: raw.records.map((r: any) => ({
+      ...r,
+      ts: new BN(r.ts, 16),
+    })),
+  };
+}
 
 export default function Page() {
   const id = useParams().id?.toString();
@@ -20,7 +32,8 @@ export default function Page() {
       try {
         const res = await fetch(`/api/trace?id=${id}`);
         const data = await res.json();
-        setTraceData(data);
+        const traceData = reviveTrace(data);
+        setTraceData(traceData);
       } catch (err) {
         console.error('查询失败:', err);
         setTraceData(null);
