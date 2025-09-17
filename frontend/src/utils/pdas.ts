@@ -54,7 +54,7 @@ async function addUserToWhitelist(program: Program<Trace>, userToAdd: web3.Publi
     .accounts({
       whitelistAccount: whitelistPda,
       admin: program.provider.publicKey!,
-    })
+    } as any)
     .rpc();
   return handleRpc(txPromise);
 }
@@ -67,7 +67,7 @@ async function removeUserFromWhitelist(program: Program<Trace>, userToRemove: we
     .accounts({
       whitelistAccount: whitelistPda,
       admin: program.provider.publicKey!,
-    })
+    } as any)
     .rpc();
   return handleRpc(txPromise);
 }
@@ -83,7 +83,7 @@ async function initTrace(program: Program<Trace>, productId: string) {
       whitelistAccount: whitelistPda,
       user: program.provider.publicKey!,
       systemProgram: web3.SystemProgram.programId,
-    })
+    } as any)
     .rpc();
   return handleRpc(txPromise);
 }
@@ -99,7 +99,7 @@ async function appendRecord(program: Program<Trace>, productId: string, descript
       traceAccount: tracePda,
       whitelistAccount: whitelistPda,
       user: program.provider.publicKey!,
-    })
+    } as any)
     .rpc();
   return handleRpc(txPromise);
 }
@@ -113,7 +113,7 @@ async function updateRecord(program: Program<Trace>, productId: string, index: n
       traceAccount: tracePda,
       whitelistAccount: whitelistPda,
       user: program.provider.publicKey!,
-    })
+    } as any)
     .rpc();
   return handleRpc(txPromise);
 }
@@ -128,7 +128,7 @@ async function deleteRecord(program: Program<Trace>, productId: string, index: n
       traceAccount: tracePda,
       whitelistAccount: whitelistPda,
       user: program.provider.publicKey!,
-    })
+    } as any)
     .rpc();
   return handleRpc(txPromise);
 }
@@ -143,7 +143,7 @@ async function clearRecords(program: Program<Trace>, productId: string) {
       traceAccount: tracePda,
       whitelistAccount: whitelistPda,
       user: program.provider.publicKey!,
-    })
+    } as any)
     .rpc();
   return handleRpc(txPromise);
 }
@@ -157,7 +157,7 @@ async function initWhitelist(program: Program<Trace>) {
       whitelistAccount: whitelistPda,
       user: program.provider.publicKey!,
       systemProgram: web3.SystemProgram.programId,
-    })
+    } as any)
     .rpc();
   return handleRpc(txPromise);
 }
