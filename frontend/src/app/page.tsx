@@ -154,9 +154,7 @@ export default function Home() {
       <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-muted/20">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="text-center relative">
-            <div className="absolute inset-0 flex items-center justify-center opacity-10">
-              <div className="w-96 h-96 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur-3xl"></div>
-            </div>
+
 
             <div className="relative">
               <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
@@ -192,7 +190,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-row-reverse sm:flex-row">
                   <Button
                     className="h-14 px-8 text-lg font-medium rounded-xl shadow-lg hover:shadow-xl"
                     disabled={loading}
@@ -263,6 +261,8 @@ export default function Home() {
                     </Popover>
                   )}
                 </div>
+
+
               </div>
             </div>
           </div>
