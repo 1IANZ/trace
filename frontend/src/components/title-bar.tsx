@@ -16,7 +16,7 @@ export default function TitleBar({ solBalance }: { solBalance: number }) {
       <div className="flex items-center space-x-3">
         <ModeToggle />
         <div className=" px-3 py-1 rounded-lg border text-sm font-medium ">
-          {solBalance.toFixed(4)} ◎
+          {solBalance.toFixed(4)}
         </div>
         <WalletMultiButton />
       </div>
